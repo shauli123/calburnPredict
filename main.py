@@ -45,7 +45,7 @@ def load_data():
 
     df['ExerciseLevel'] = df['Calories'].apply(get_exercise_level)
     df['ExerciseLevelName'] = df['ExerciseLevel'].map({0: 'נמוך', 1: 'בינוני', 2: 'גבוה'})
-    df['Gender'] = df['Gender'].map({'female': 'נקבה', 'male': 'זכר'})
+    # df['Gender'] = df['Gender'].map({'female': 'נקבה', 'male': 'זכר'})
 
     return df
 
@@ -157,31 +157,58 @@ elif page == "ניתוח נתונים":
             st.metric("גיל ממוצע", f"{df['Age'].mean():.1f} שנים")
 
     with tab2:
-        st.subheader("יחסים בין משתנים")
+        st.subheader("קשרים בין משתנים")
 
         fig1, ax1 = plt.subplots(figsize=(10, 6))
-        sns.scatterplot(data=df, x='Heart_Rate', y='Calories', hue='Gender', palette='tab10', ax=ax1)
-        ax1.set_title('קצב לב מול קלוריות')
+        sns.scatterplot(data=df, x='Heart_Rate', y='Calories', hue='ExerciseLevel', palette='tab10', ax=ax1)
+        ax1.set_title('Heart Rate vs Calories by Exercise Level')
+        ax1.set_xlabel('Heart Rate (bpm)')
+        ax1.set_ylabel('Calories Burned')
         st.pyplot(fig1)
 
         fig2, ax2 = plt.subplots(figsize=(10, 6))
-        sns.boxplot(data=df, x='Gender', y='Calories', ax=ax2)
-        ax2.set_title('קלוריות לפי מין')
+        sns.boxplot(data=df, x='Gender', y='Calories', hue='Gender',ax=ax2)
+        ax2.set_title('Calories Burned by Gender')
+        ax2.set_xlabel('Gender')
+        ax2.set_ylabel('Calories Burned')
         st.pyplot(fig2)
 
         fig3, ax3 = plt.subplots(figsize=(10, 6))
         sns.scatterplot(data=df, x='Height', y='Weight', hue='Gender', palette='tab10', ax=ax3)
-        ax3.set_title('גובה מול משקל')
+        ax3.set_title('Height vs Weight by Gender')
+        ax3.set_xlabel('Height (cm)')
+        ax3.set_ylabel('Weight (kg)')
         st.pyplot(fig3)
+        fig4, ax4 = plt.subplots(figsize=(10, 6))
+        sns.boxplot(data=df, x='ExerciseLevel', y='Weight', hue='ExerciseLevel', palette='tab10', ax=ax4)
+        plt.xlabel('Exercise Level')
+        plt.ylabel('Weight')
+        plt.title('Exercise Level vs Weight')
+        st.pyplot(fig4)
 
+        fig5, ax5 = plt.subplots(figsize=(10, 8))
+        sns.barplot(
+            data=df,
+            x='Gender',
+            y='Heart_Rate',
+            hue='Gender',
+            palette='tab10',
+            ax=ax5
+        )
+        ax5.set_xlabel('Gender')
+        ax5.set_ylabel('Heart Rate')
+        ax5.set_title('Gender vs Heart Rate')
+        st.pyplot(fig5)
+    
     with tab3:
-        st.subheader("מפת קורלציות")
+        st.subheader("Correlation Matrix")
 
         numeric_cols = df[['Age', 'Height', 'Weight', 'Duration', 'Heart_Rate', 'Body_Temp', 'Calories']]
         fig, ax = plt.subplots(figsize=(10, 8))
-        sns.heatmap(numeric_cols.corr(), annot=True, cmap='vlag', fmt='.2f', center=0, ax=ax)
+        sns.heatmap(numeric_cols.corr(), annot=True, cmap='vlag',
+                    fmt='.2f', center=0, ax=ax)
+        ax.set_title('Correlation Matrix of Numeric Variables')
         st.pyplot(fig)
-
     with tab4:
         st.subheader("תובנות מרכזיות")
 
